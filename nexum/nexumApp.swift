@@ -92,7 +92,6 @@ struct empty4: View {
 
 struct Menu: View {
     @State var selection = 2
-        
     var body: some View {
         //Tab Bar at bottom
         TabView(selection: $selection){
@@ -133,6 +132,9 @@ struct Login: View {
     @State var pwd = "";
     @State var loggedIn = false;
     var body: some View {
+        if loggedIn {
+            Menu();
+        }
         ZStack {
             bgcolor.ignoresSafeArea()
             VStack{
