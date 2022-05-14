@@ -9,6 +9,8 @@ import SwiftUI
 
 //colors
 let bgcolor = Color(red: 60/255, green: 60/255, blue: 60/255)
+let purple1 = Color(red: 88/255,green:0/255,blue:108/255)
+
 
 //pages
 struct empty1: View {
@@ -129,6 +131,7 @@ struct Menu: View {
 struct Login: View {
     @State var usr = "";
     @State var pwd = "";
+    @State var loggedIn = false;
     var body: some View {
         ZStack {
             bgcolor.ignoresSafeArea()
@@ -138,8 +141,8 @@ struct Login: View {
                 Text("Username:")
                 ZStack {
                     RoundedRectangle(cornerRadius:10)
-                        .fill(.purple)
-                        .frame(width: 200.0, height: 40.0)
+                        .fill(purple1)
+                        .frame(width: 200.0, height: 30.0)
                     TextField("e",text:$usr)
                         .multilineTextAlignment(.center)
                 }
@@ -148,11 +151,17 @@ struct Login: View {
                 Text("Password:")
                 ZStack {
                     RoundedRectangle(cornerRadius:10)
-                        .fill(.purple)
-                        .frame(width: 200.0, height: 40.0)
+                        .fill(purple1)
+                        .frame(width: 200.0, height: 30.0)
                     TextField("e",text:$pwd)
                         .multilineTextAlignment(.center)
                 }
+                Button(action:{loggedIn = true}){
+                    //Text("Login")
+                    Image(systemName:"chevron.right.circle").resizable().frame(width: 25.0, height: 25.0)
+                }
+                .padding(.top)
+                
                 //}
                 Spacer()
 
