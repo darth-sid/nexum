@@ -130,23 +130,40 @@ struct Login: View {
     @State var usr = "";
     @State var pwd = "";
     var body: some View {
-        VStack{
-            HStack{
+        ZStack {
+            bgcolor.ignoresSafeArea()
+            VStack{
+                Spacer()
+                //HStack{
                 Text("Username:")
-                TextField($usr)
-            }
-            HStack{
+                ZStack {
+                    RoundedRectangle(cornerRadius:10)
+                        .fill(.purple)
+                        .frame(width: 200.0, height: 40.0)
+                    TextField("e",text:$usr)
+                        .multilineTextAlignment(.center)
+                }
+                //}
+                //HStack{
                 Text("Password:")
-                TextField($pwd)
-            }
+                ZStack {
+                    RoundedRectangle(cornerRadius:10)
+                        .fill(.purple)
+                        .frame(width: 200.0, height: 40.0)
+                    TextField("e",text:$pwd)
+                        .multilineTextAlignment(.center)
+                }
+                //}
+                Spacer()
 
+            }
         }
     }
 }
 
 struct nexumPreview: PreviewProvider {
     static var previews: some View {
-        Menu()
+        Login()
     }
 }
 
@@ -154,7 +171,7 @@ struct nexumPreview: PreviewProvider {
 struct nexumApp: App {
     var body: some Scene {
         WindowGroup {
-            Menu()
+            Login()
         }
     }
 }
