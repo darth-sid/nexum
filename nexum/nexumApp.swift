@@ -133,38 +133,46 @@ struct Login: View {
     @State var pwd = "";
     @State var loggedIn = false;
     var body: some View {
-        ZStack {
-            bgcolor.ignoresSafeArea()
-            VStack{
-                Spacer()
-                //HStack{
-                Text("Username:")
-                ZStack {
-                    RoundedRectangle(cornerRadius:10)
-                        .fill(purple1)
-                        .frame(width: 200.0, height: 30.0)
-                    TextField("e",text:$usr)
-                        .multilineTextAlignment(.center)
-                }
-                //}
-                //HStack{
-                Text("Password:")
-                ZStack {
-                    RoundedRectangle(cornerRadius:10)
-                        .fill(purple1)
-                        .frame(width: 200.0, height: 30.0)
-                    TextField("e",text:$pwd)
-                        .multilineTextAlignment(.center)
-                }
-                Button(action:{loggedIn = true}){
-                    //Text("Login")
-                    Image(systemName:"chevron.right.circle").resizable().frame(width: 25.0, height: 25.0)
-                }
-                .padding(.top)
-                
-                //}
-                Spacer()
+        if(loggedIn){
+            Menu();
+        }
+        else{
+            ZStack {
+                bgcolor.ignoresSafeArea()
+                VStack{
+                    Spacer()
+                    //HStack{
+                    Text("Username:")
+                    ZStack {
+                        RoundedRectangle(cornerRadius:10)
+                            .fill(purple1)
+                            .frame(width: 200.0, height: 30.0)
+                        TextField("e",text:$usr)
+                            .multilineTextAlignment(.center)
+                    }
+                    //}
+                    //HStack{
+                    Text("Password:")
+                    ZStack {
+                        RoundedRectangle(cornerRadius:10)
+                            .fill(purple1)
+                            .frame(width: 200.0, height: 30.0)
+                        TextField("e",text:$pwd)
+                            .multilineTextAlignment(.center)
+                    }
+                    Button(action:{
+                        loggedIn = true
+                        
+                    }){
+                        //Text("Login")
+                        Image(systemName:"chevron.right.circle").resizable().frame(width: 25.0, height: 25.0)
+                    }
+                    .padding(.top)
+                    
+                    //}
+                    Spacer()
 
+                }
             }
         }
     }
