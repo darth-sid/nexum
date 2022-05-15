@@ -92,8 +92,13 @@ func getAcct(id: String){
     task.resume()
 }
 
-struct empty2: View {
-    @State var image = "offbutton"
+// Created by: Brighton Alcantara
+// Edited by: Siddharth Ajay
+struct Search: View {
+    @State var image = "offbutton";
+    @State var searchItem = "";
+    @State var emptyBool = true;
+    @State var someSelect = "";
     var body: some View {
         ZStack {
             bgcolor.ignoresSafeArea()
@@ -102,27 +107,186 @@ struct empty2: View {
             
             VStack(){
                 Spacer()
-                    //On Off Button
+                    .frame(height: 60)
+                Text("Search")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                // Search bar
+                ZStack() {
+                    RoundedRectangle(cornerRadius: 20)
+                        .frame(width:300, height: 30)
+                        .foregroundColor(.white)
+                    HStack() {
+                    Image(systemName: "magnifyingglass")
+                        .resizable()
+                        .foregroundColor(.black)
+                        .frame(width: 20, height: 20)
                     
-
+                        TextField("Search...", text: $searchItem)
+                            .background(.white)
+                            .frame(width: 250)
+                    }
+                }
+                
+                // Filters
+                HStack {
+                    Spacer()
+                    
+                    // "Sort by" menu
+                    Text("Sort by:")
+                        .foregroundColor(.white)
+                        .font(.caption)
+                    ZStack() {
+                        RoundedRectangle(cornerRadius: 5)
+                            .frame(width:100, height: 30)
+                            .foregroundColor(.white)
+                        Picker("sortby", selection: $someSelect) {
+                            Text("Latest").tag("Latest")
+                            Text("Oldest").tag("Latest")
+                            Text("Most Popular").tag("Latest")
+                        }
+                    }
+                    Spacer()
+                        .frame(width: 6)
+                    
+                    // "Show" menu
+                    Text("Show:")
+                        .foregroundColor(.white)
+                        .font(.caption)
+                    ZStack() {
+                        RoundedRectangle(cornerRadius: 5)
+                            .frame(width:80, height: 30)
+                            .foregroundColor(.white)
+                        Picker("show", selection: $someSelect) {
+                            Text("All").tag("Latest")
+                            Text("People").tag("Latest")
+                            Text("Products").tag("Latest")
+                        }
+                    }
                 Spacer()
+                }
+                
+                // Search results
+                ZStack() {
+                    RoundedRectangle(cornerRadius: 5)
+                        .foregroundColor(gray1)
+                        .frame(width: 300.0, height:500.0,alignment: .top)
+                    VStack() {
+                        Spacer()
+                            .frame(height: 10)
+                        ScrollView {
+                            
+                            // People
+                            HStack() {
+                                Spacer()
+                                    .frame(width: 20)
+                                Text("People")
+                                    .foregroundColor(.white)
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                Spacer()
+                            }
+                            
+                            // Candice
+                            Button(action: {emptyBool = false}) {
+                                Image(systemName: "person.circle.fill")
+                                    .resizable()
+                                    .foregroundColor(.white)
+                                    .frame(width: 50, height: 50)
+                                Spacer()
+                                    .frame(width: 10)
+                                
+                                // Quick Personal info
+                                VStack(alignment: .leading) {
+                                    Text("Candice")
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                    Text("Investor")
+                                        .italic()
+                                        .foregroundColor(.purple)
+                                        .font(.subheadline)
+                                    Text("Hello! I am an investor looking to...")
+                                        .font(.caption)
+                                        .foregroundColor(.black)
+                                            
+                                } ;Spacer()}.frame(width: 280, height: 60)
+                            
+                            // Perry
+                            Button(action: {emptyBool = false}) {
+                                Image(systemName: "person.circle.fill")
+                                    .resizable()
+                                    .foregroundColor(.white)
+                                    .frame(width: 50, height: 50)
+                                Spacer()
+                                    .frame(width: 10)
+                                
+                                // Quick Personal info
+                                VStack(alignment: .leading) {
+                                    Text("Perry")
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                    Text("Entrepreneur")
+                                        .italic()
+                                        .foregroundColor(.purple)
+                                        .font(.subheadline)
+                                    Text("Hi! I am an entrepreneur trying to...")
+                                        .font(.caption)
+                                        .foregroundColor(.black)
+                                            
+                                }; Spacer()}.frame(width: 280, height: 60)
+                        
+                            HStack() {
+                                Spacer()
+                                    .frame(width: 20)
+                                Text("Products")
+                                    .foregroundColor(.white)
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                Spacer()
+                            }
+                            
+                            // Products
+                            Button(action: {emptyBool = false}) {
+                                Image(systemName: "shippingbox.circle.fill")
+                                    .resizable()
+                                    .foregroundColor(.white)
+                                    .frame(width: 50, height: 50)
+                                Spacer()
+                                    .frame(width: 10)
+                                
+                                // Quick Personal info
+                                VStack(alignment: .leading) {
+                                    Text("Robotic Turret")
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                    Text("Created By: Perry")
+                                        .italic()
+                                        .foregroundColor(.purple)
+                                        .font(.subheadline)
+                                    Text("Engineering, Robotics, Tech")
+                                        .font(.caption)
+                                        .foregroundColor(.black)
+                                            
+                                } ;Spacer()}.frame(width: 280, height: 60)
+                    }
+                }
             }
             .frame(width: 300.0, height: 500.0,alignment: .top)
             }
         }
 }
-
+}
 // Created by: Brighton Alcantara
 // Edited by: Siddharth Ajay
 struct Settings: View {
     @State var image = "offbutton";
-    @State var emptyBool = false;
+    @State var emptyBool = true;
     var body: some View {
         ZStack {
             bgcolor.ignoresSafeArea()
             //Image("g r a ss")
             // . resizable().aspectRatio(1.5,contentMode: .fill)
-            
             VStack(){
                 Spacer()
                 Text("Settings")
@@ -279,7 +443,7 @@ struct Menu: View {
                     Text("Profile")
             }
             .tag(1)
-        empty2()
+        Search()
             .tabItem {
                 Image(systemName: "power")
                 Text("Manual")
