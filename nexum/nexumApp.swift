@@ -153,7 +153,6 @@ struct Profile: View {
                             }
                             }
                         Spacer()
-                            .frame()
                         }
                         Spacer()
                     }
