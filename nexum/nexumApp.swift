@@ -72,8 +72,12 @@ struct empty2: View {
             }
         }
 }
-struct empty3: View {
-    @State var image = "offbutton"
+
+// Created by: Brighton Alcantara
+// Edited by: Siddharth Ajay
+struct Settings: View {
+    @State var image = "offbutton";
+    @State var emptyBool = false;
     var body: some View {
         ZStack {
             bgcolor.ignoresSafeArea()
@@ -82,8 +86,32 @@ struct empty3: View {
             
             VStack(){
                 Spacer()
-                    //On Off Button
-                    
+                Text("Settings")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                Spacer()
+                    .frame(height:20)
+                
+                // Profile picture settings
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .foregroundColor(.white)
+                    .frame(width: 100, height: 100)
+                Spacer()
+                // Settings List
+                List {
+                    Button(action: {emptyBool = true}) {
+                        Text("Change Username")
+                    } .listRowBackground(gray1)
+                    Button(action: {emptyBool = true}) {
+                        Text("Change Username")
+                    } .listRowBackground(gray1)
+
+                }
+                .onAppear {
+                    UITableView.appearance().backgroundColor = .clear
+                }
 
                 Spacer()
             }
@@ -91,6 +119,9 @@ struct empty3: View {
             }
         }
 }
+
+// Created by: Brighton Alcantara
+// Edited by: Siddharth Ajay
 struct Profile: View {
     @State var image = "offbutton"
     var body: some View {
@@ -201,7 +232,7 @@ struct Menu: View {
                 Text("Manual")
                     
                 }.tag(2)
-        empty3()
+        Settings()
             .tabItem {
                 Image(systemName: "square.grid.2x2")
                 Text("Custom")
@@ -321,7 +352,7 @@ struct Login: View {
 }
 struct nexumPreview: PreviewProvider {
     static var previews: some View {
-        Profile()
+        Settings()
     }
 }
 
