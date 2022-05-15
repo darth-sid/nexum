@@ -11,30 +11,90 @@ import SwiftUI
 let bgcolor = Color(red: 60/255, green: 60/255, blue: 60/255)
 let purple1 = Color(red: 88/255,green:0/255,blue:108/255)
 let gray1 = Color(red: 88/255,green:88/255,blue:88/255)
+
+public var auth: String = "0"
+public var acct: Acct = Acct(name:"John Smith",phoneNo:"(123)456-7890",email:"john.smith@email.com",links:["www.johnsmith.com","https://www.youtube.com/watch?v=dQw4w9WgXcQ"],productNames:["John","Smith"]);
+
 public struct Response: Codable {
-    var status: Int
+    var auth: String
+    var acct: Acct
 }
 
-func login(usr: String, pwd: String, authKey: String){
-    let payload: [String:String] = ["usr":usr,"pwd":pwd,"auth":authKey]
+public struct Acct: Codable {
+    var name : String
+    var phoneNo : String
+    var email : String
+    var links: [String]
+    var productNames: [String]
+}
+
+func login(usr: String, pwd: String){
+    let payload: [String:String] = ["usr":usr,"pwd":pwd]
     let payloadEncoded = try! JSONSerialization.data(withJSONObject: payload)
-    guard let url = URL(string:"http://192.168.1.23:5000/login" ) else {return}
+    guard let url = URL(string:"http://127.0.0.1:5000/login" ) else {return}
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     request.httpBody = payloadEncoded
-    URLSession.shared.dataTask(with: request) { data, response, error in
-        if let data = data {
-            if let decodedData = try? JSONDecoder().decode(Response.self, from: data) {
-                print("d:\(decodedData)")
+    let task = URLSession.shared.dataTask(with: request) { (data,response,error) in
+        if let error = error {
+            print("Error: \(error)")
+            return
+        }
+        if let data = data{
+            if let dataDecoded = try? JSONDecoder().decode(Response.self, from: data){
+                DispatchQueue.main.async{
+                    auth = dataDecoded.auth
+                    acct = dataDecoded.acct
+                }
             }
         }
-    }.resume()
+    }
+    
+    task.resume()
+}
+
+func logout(id: String){
+    let payload: [String:String] = ["id":id]
+    let payloadEncoded = try! JSONSerialization.data(withJSONObject: payload)
+    guard let url = URL(string:"http://127.0.0.1:5000/logout" ) else {return}
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.httpBody = payloadEncoded
+    let task = URLSession.shared.dataTask(with: request) { (data,response,error) in
+        if let error = error {
+            print("Error: \(error)")
+            return
+        }
+    }
+    
+    task.resume()
+}
+
+func getAcct(id: String){
+    let payload: [String:String] = ["id":id]
+    let payloadEncoded = try! JSONSerialization.data(withJSONObject: payload)
+    guard let url = URL(string:"http://127.0.0.1:5000/acct" ) else {return}
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.httpBody = payloadEncoded
+    let task = URLSession.shared.dataTask(with: request) { (data,response,error) in
+        if let error = error {
+            print("Error: \(error)")
+            return
+        }
+        if let data = data{
+            if let dataDecoded = try? JSONDecoder().decode(Acct.self, from: data){
+                DispatchQueue.main.async{acct = dataDecoded}
+            }
+        }
+    }
+    
+    task.resume()
 }
 
 
-
 //pages
-struct empty1: View {
+struct Settings: View {
     @State var image = "offbutton"
     var body: some View {
         ZStack {
@@ -45,7 +105,9 @@ struct empty1: View {
             VStack(){
                 Spacer()
                     //On Off Button
-                    
+                Button(action:{print(auth)}){
+                    Text("Auth")
+                }
 
                 Spacer()
             }
@@ -92,7 +154,6 @@ struct empty3: View {
         }
 }
 struct Profile: View {
-    @State var image = "offbutton"
     var body: some View {
         ZStack {
             bgcolor.ignoresSafeArea()
@@ -103,7 +164,7 @@ struct Profile: View {
                 Spacer()
                 
                 // Profile title
-                Text("Finn's Profile")
+                Text("Your Profile")
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -120,13 +181,13 @@ struct Profile: View {
                     
                     // Quick Personal info
                     VStack(alignment: .leading, spacing: 5) {
-                        Text("Fineas Phlynn")
+                        Text(acct.name)
                             .foregroundColor(.white)
                             .multilineTextAlignment(.leading)
                         Text("Entrepreneur")
                             .italic()
                             .foregroundColor(.purple)
-                        Text("Contact here: (123) 456-7889")
+                        Text("Contact here: \(acct.phoneNo) \(acct.email)")
                             .foregroundColor(.white)
                     }
                 }
@@ -151,10 +212,9 @@ struct Profile: View {
                             Spacer()
                                 .frame(width: 10)
                             VStack(alignment: .leading) {
-                                Text("Resume")
-                                    .foregroundColor(.cyan)
-                                Text("summervacationbuilds.com")
-                                    .foregroundColor(.cyan)
+                                ForEach(0..<acct.links.count, id:\.self){
+                                    Text(acct.links[$0]).foregroundColor(.blue)
+                                }
                             }
                         }
                         
@@ -167,10 +227,9 @@ struct Profile: View {
                             Spacer()
                                 .frame(width: 10)
                             VStack(alignment: .leading) {
-                                Text("Beach Robot")
-                                    .foregroundColor(.white)
-                                Text("")
-                                    .foregroundColor(.white)
+                                ForEach(0..<acct.productNames.count, id:\.self){
+                                    Text(acct.productNames[$0]).foregroundColor(.white)
+                                }
                             }
                             }
                         Spacer()
@@ -188,11 +247,13 @@ struct Menu: View {
     @State var selection = 2
     var body: some View {
         //Tab Bar at bottom
+        
         TabView(selection: $selection){
-        empty1()
+        
+        Profile()
             .tabItem {
-                Image(systemName: "gearshape.fill")
-                Text("Settings")
+                    Image(systemName: "person.crop.circle.fill")
+                    Text("Profile")
             }
             .tag(1)
         empty2()
@@ -209,10 +270,10 @@ struct Menu: View {
                 
             }
             .tag(3)
-        Profile()
+        Settings()
             .tabItem {
-                    Image(systemName: "leaf.fill")
-                    Text("Plant Presets")
+                Image(systemName: "gearshape.fill")
+                Text("Settings")
             }
             .tag(4)
             
@@ -224,104 +285,81 @@ struct Menu: View {
 struct Login: View {
     @State var usr = "";
     @State var pwd = "";
-    @State var loggedIn = false;
-    @State var auth = "";
+    @State var loggedIn = false
     var body: some View {
         ZStack {
-            bgcolor.ignoresSafeArea()
-            VStack{
-                Spacer()
-                //HStack{
-                Text("Username:")
-                ZStack {
-                    RoundedRectangle(cornerRadius:10)
-                        .fill(purple1)
-                        .frame(width: 200.0, height: 30.0)
-                    TextField("e",text:$usr)
-                        .multilineTextAlignment(.center)
-                }
-                //}
-                //HStack{
-                Text("Password:")
-                ZStack {
-                    RoundedRectangle(cornerRadius:10)
-                        .fill(purple1)
-                        .frame(width: 200.0, height: 30.0)
-                    TextField("e",text:$pwd)
-                        .multilineTextAlignment(.center)
-                }
-                Button(action:{loggedIn = true}){
-                    //Text("Login")
-                    Image(systemName:"chevron.right.circle").resizable().frame(width: 25.0, height: 25.0)
-                }
-                .padding(.top)
+            if(loggedIn){
                 
-                //}
-                Spacer()
-        if(loggedIn){
-            Menu();
-        }
-        else{
-            ZStack {
-                bgcolor.ignoresSafeArea()
-                VStack{
-                    Spacer()
-                    //HStack{
-                    Text("Username:")
-                    ZStack {
-                        RoundedRectangle(cornerRadius:10)
-                            .fill(purple1)
-                            .frame(width: 200.0, height: 30.0)
-                        TextField("e",text:$usr)
-                            .multilineTextAlignment(.center)
-                    }
-                    //}
-                    //HStack{
-                    Text("Password:")
-                    ZStack {
-                        RoundedRectangle(cornerRadius:10)
-                            .fill(purple1)
-                            .frame(width: 200.0, height: 30.0)
-                        TextField("e",text:$pwd)
-                            .multilineTextAlignment(.center)
-                    }
-                    Button(action:{
-                        var i = 0;
-                        auth = ""
-                        while(i < 20){
-                            let x = Int.random(in: 0..<3)
-                            if (x==0){
-                                auth = auth + String(Int.random(in: 0..<10));
-                            }
-                            else if (x==1){
-                                auth = auth + String(UnicodeScalar(UInt8(Int.random(in: 65..<91))));
-                            }
-                            else{
-                                auth = auth + String(UnicodeScalar(UInt8(Int.random(in: 97..<123))));
-                            }
-                            i = i + 1;
+                Menu();
+            }
+            else{
+                ZStack {
+                    bgcolor.ignoresSafeArea()
+                    VStack{
+                        Spacer()
+                        Text("Username:")
+                        ZStack {
+                            RoundedRectangle(cornerRadius:10)
+                                .fill(purple1)
+                                .frame(width: 200.0, height: 30.0)
+                            TextField("e",text:$usr)
+                                .multilineTextAlignment(.center)
                         }
-                        print(auth)
-                        login(usr:usr,pwd:pwd,authKey:auth)
-                    }){
-                        //Text("Login")
-                        Image(systemName:"chevron.right.circle").resizable().frame(width: 25.0, height: 25.0)
-                    }
-                    .padding(.top)
-                    
-                    //}
-                    Spacer()
+                        //}
+                        //HStack{
+                        Text("Password:")
+                        ZStack {
+                            RoundedRectangle(cornerRadius:10)
+                                .fill(purple1)
+                                .frame(width: 200.0, height: 30.0)
+                            TextField("e",text:$pwd)
+                                .multilineTextAlignment(.center)
+                        }
+                        Button(action:{
+                            /*var i = 0;
+                            auth = ""
+                            while(i < 20){
+                                let x = Int.random(in: 0..<3)
+                                if (x==0){
+                                    auth = auth + String(Int.random(in: 0..<10));
+                                }
+                                else if (x==1){
+                                    auth = auth + String(UnicodeScalar(UInt8(Int.random(in: 65..<91))));
+                                }
+                                else{
+                                    auth = auth + String(UnicodeScalar(UInt8(Int.random(in: 97..<123))));
+                                }
+                                i = i + 1;
+                            }
+                            print(auth)*/
+                            login(usr:usr,pwd:pwd)
+                            if(auth != "0"){
+                                //getAcct(id: auth)
+                                loggedIn = true
+                            }
+                            print(auth)
+                        }){
+                            //Text("Login")
+                            Image(systemName:"chevron.right.circle").resizable().frame(width: 25.0, height: 25.0)
+                        }
+                        .padding(.top)
+                        Spacer()
+                        Button(action:{print("register!")}){
+                            Text("Register")
+                        }
+                        //}
+                        Spacer()
 
+                    }
                 }
             }
         }
     }
 }
-    }
-}
+
 struct nexumPreview: PreviewProvider {
     static var previews: some View {
-        Profile()
+        Login()
     }
 }
 
