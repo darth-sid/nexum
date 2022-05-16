@@ -470,24 +470,16 @@ struct Menu: View {
             .tag(1)
         Search()
             .tabItem {
-                Image(systemName: "power")
-                Text("Manual")
+                Image(systemName: "magnifyingglass.circle.fill")
+                Text("Search")
                     
                 }.tag(2)
-        Settings()
-            .tabItem {
-                Image(systemName: "square.grid.2x2")
-                Text("Custom")
-            
-                
-            }
-            .tag(3)
         Settings()
             .tabItem {
                 Image(systemName: "gearshape.fill")
                 Text("Settings")
             }
-            .tag(4)
+            .tag(3)
             
         }
 
