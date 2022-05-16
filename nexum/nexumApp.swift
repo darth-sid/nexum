@@ -277,6 +277,8 @@ struct Search: View {
         }
 }
 }
+
+
 // Created by: Brighton Alcantara
 // Edited by: Siddharth Ajay
 struct Settings: View {
@@ -546,7 +548,7 @@ struct Login: View {
 
 struct nexumPreview: PreviewProvider {
     static var previews: some View {
-        Login()
+        Settings()
     }
 }
 
