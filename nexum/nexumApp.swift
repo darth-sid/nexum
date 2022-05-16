@@ -13,7 +13,7 @@ let purple1 = Color(red: 88/255,green:0/255,blue:108/255)
 let gray1 = Color(red: 88/255,green:88/255,blue:88/255)
 
 public var auth: String = "0"
-public var acct: Acct = Acct(name:"John Smith",phoneNo:"(123)456-7890",email:"john.smith@email.com",links:["www.johnsmith.com","https://www.youtube.com/watch?v=dQw4w9WgXcQ"],productNames:["John","Smith"]);
+public var acct: Acct = Acct(Fname:"John",Lname: "Smith",phoneNo:"(123)456-7890",email:"john.smith@email.com",links:["www.johnsmith.com","https://www.youtube.com/watch?v=dQw4w9WgXcQ"],productNames:["John","Smith"]);
 
 public struct Response: Codable {
     var auth: String
@@ -21,11 +21,18 @@ public struct Response: Codable {
 }
 
 public struct Acct: Codable {
-    var name : String
+    var Fname : String
+    var Lname : String
     var phoneNo : String
     var email : String
     var links: [String]
     var productNames: [String]
+}
+
+public struct newAcct: Codable{
+    var usr: String
+    var pwd: String
+    var acct: Acct
 }
 
 func login(usr: String, pwd: String){
@@ -41,8 +48,10 @@ func login(usr: String, pwd: String){
             return
         }
         if let data = data{
+            print(data)
             if let dataDecoded = try? JSONDecoder().decode(Response.self, from: data){
                 DispatchQueue.main.async{
+                    print("e")
                     auth = dataDecoded.auth
                     acct = dataDecoded.acct
                 }
@@ -50,6 +59,22 @@ func login(usr: String, pwd: String){
         }
     }
     
+    task.resume()
+}
+
+func register(usr: String, pwd: String, acct: Dictionary<String,Any>){
+    let payload:Dictionary<String,Any> = ["usr":usr,"pwd":pwd,"acct":acct]
+    let payloadEncoded = try! JSONSerialization.data(withJSONObject: payload)
+    guard let url = URL(string:"http://127.0.0.1:5000/register" ) else {return}
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.httpBody = payloadEncoded
+    let task = URLSession.shared.dataTask(with: request) { (data,response,error) in
+        if let error = error {
+            print("Error: \(error)")
+            return
+        }
+    }
     task.resume()
 }
 
@@ -351,7 +376,7 @@ struct Profile: View {
                 Spacer()
                 
                 // Profile title
-                Text("Your Profile")
+                Text(acct.Fname + "'s Profile")
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -368,7 +393,7 @@ struct Profile: View {
                     
                     // Quick Personal info
                     VStack(alignment: .leading, spacing: 5) {
-                        Text(acct.name)
+                        Text(acct.Fname + " " + acct.Lname)
                             .foregroundColor(.white)
                             .multilineTextAlignment(.leading)
                         Text("Entrepreneur")
@@ -469,15 +494,134 @@ struct Menu: View {
     }
 }
 
+struct Register: View {
+    
+    @State var username = ""
+    @State var password = ""
+    @State var confirm = ""
+    @State var firstname = ""
+    @State var lastname = ""
+    @State var email = ""
+    @State var phone = ""
+    @State var page = 0
+    var body: some View {
+        ZStack {
+            bgcolor.ignoresSafeArea()
+            //Image("g r a ss")
+            // . resizable().aspectRatio(1.5,contentMode: .fill)
+            
+            if(page == 0) {
+                VStack(alignment: .center){
+                    Spacer()
+                        //On Off Button
+                    HStack {
+                        Text("Username:")
+                        ZStack {
+                            RoundedRectangle(cornerRadius:10)
+                                .fill(purple1)
+                                .frame(width: 200.0, height: 30.0)
+                            TextField("",text:$username).frame(width: 180, height: 30.0)
+
+                        }
+                    }
+                    HStack {
+                        Text("Password:")
+                        ZStack {
+                            RoundedRectangle(cornerRadius:10)
+                                .fill(purple1)
+                                .frame(width: 200.0, height: 30.0)
+                            TextField("",text:$password).frame(width: 180, height: 30.0)
+
+                        }
+                    }
+                    HStack {
+                        Text("Confirm Password:")
+                        ZStack {
+                            RoundedRectangle(cornerRadius:10)
+                                .fill(purple1)
+                                .frame(width: 200.0, height: 30.0)
+                            TextField("",text:$confirm).frame(width: 180, height: 30.0)
+
+                        }
+                    }
+                    HStack {
+                        Text("First Name:")
+
+                        ZStack {
+                            RoundedRectangle(cornerRadius:10)
+                                .fill(purple1)
+                                .frame(width: 200.0, height: 30.0)
+                            TextField("",text:$firstname).frame(width: 180, height: 30.0)
+
+                        }
+                    }
+                    HStack {
+                        Text("Last Name:")
+                        ZStack {
+                            RoundedRectangle(cornerRadius:10)
+                                .fill(purple1)
+                                .frame(width: 200.0, height: 30.0)
+                            TextField("",text:$lastname).frame(width: 180, height: 30.0)
+
+                        }
+                    }
+                    HStack {
+                        Text("Email:")
+
+                        ZStack {
+                            RoundedRectangle(cornerRadius:10)
+                                .fill(purple1)
+                                .frame(width: 200.0, height: 30.0)
+                            TextField("",text:$email).frame(width: 180, height: 30.0)
+
+                        }
+                    }
+                    HStack {
+                        Text("Phone:")
+                        ZStack {
+                            RoundedRectangle(cornerRadius:10)
+                                .fill(purple1)
+                                .frame(width: 200.0, height: 30.0)
+                            TextField("",text:$phone).frame(width: 180, height: 30.0)
+
+                        }
+                    }
+                    Spacer()
+                    Button(action:{
+                        if(email != "" && username != "" && password != "" && password == confirm && firstname != "" && lastname != ""){
+                            let a: Dictionary<String, Any> = ["Fname":firstname,"Lname":lastname,"phoneNo":phone,"email":email,"links":[""],"productNames":[""]]
+                            register(usr:username,pwd:password,acct:a)
+                            page=1
+                        }
+                    }){
+                        HStack {
+                            Text("Register")
+                            Image(systemName: "play")
+                        }
+                    }
+                    //Spacer()
+                }
+                .frame(width: 300.0, height: 500.0,alignment: .top)
+            }
+            else if (page == 1){
+                Login()
+            }
+        }
+    }
+}
+
 struct Login: View {
     @State var usr = "";
     @State var pwd = "";
     @State var loggedIn = false
+    @State var registering = false
     var body: some View {
         ZStack {
             if(loggedIn){
-                
                 Menu();
+            }
+            else if(registering){
+                Register()
             }
             else{
                 ZStack {
@@ -531,7 +675,7 @@ struct Login: View {
                         }
                         .padding(.top)
                         Spacer()
-                        Button(action:{print("register!")}){
+                        Button(action:{registering=true}){
                             Text("Register")
                         }
                         //}
@@ -546,7 +690,7 @@ struct Login: View {
 
 struct nexumPreview: PreviewProvider {
     static var previews: some View {
-        Login()
+        Register()
     }
 }
 
